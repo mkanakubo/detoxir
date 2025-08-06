@@ -29,7 +29,7 @@ export async function GET() {
     }
 
     const data = await response.json();
-    
+
     if (data.errors) {
       throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
     }
@@ -39,7 +39,7 @@ export async function GET() {
     console.error('Error fetching users:', error);
     return NextResponse.json(
       { error: 'Failed to fetch users' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    
+
     if (data.errors) {
       throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
     }
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     console.error('Error creating user:', error);
     return NextResponse.json(
       { error: 'Failed to create user' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

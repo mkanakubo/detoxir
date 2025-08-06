@@ -67,13 +67,16 @@ export default function Home() {
         <h1 className="text-4xl font-bold mb-8 text-center">
           Detoxir Full-Stack Demo
         </h1>
-        
+
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-4">Add New User</h2>
             <form onSubmit={createUser} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium mb-1"
+                >
                   Name
                 </label>
                 <input
@@ -86,7 +89,10 @@ export default function Home() {
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium mb-1"
+                >
                   Email
                 </label>
                 <input
@@ -117,7 +123,7 @@ export default function Home() {
                 Refresh
               </button>
             </div>
-            
+
             {loading ? (
               <p className="text-gray-500">Loading...</p>
             ) : (
@@ -144,11 +150,22 @@ export default function Home() {
         <div className="mt-8 p-4 bg-blue-50 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">Architecture Flow:</h3>
           <ol className="list-decimal list-inside space-y-1 text-sm">
-            <li><strong>Frontend (Next.js)</strong> → HTTP request to API route</li>
-            <li><strong>API Route (/api/users)</strong> → GraphQL query to backend</li>
-            <li><strong>Backend (NestJS)</strong> → GraphQL resolver processes request</li>
-            <li><strong>GraphQL Response</strong> → Back to API route</li>
-            <li><strong>HTTP Response</strong> → Back to frontend</li>
+            <li>
+              <strong>Frontend (Next.js)</strong> → HTTP request to API route
+            </li>
+            <li>
+              <strong>API Route (/api/users)</strong> → GraphQL query to backend
+            </li>
+            <li>
+              <strong>Backend (NestJS)</strong> → GraphQL resolver processes
+              request
+            </li>
+            <li>
+              <strong>GraphQL Response</strong> → Back to API route
+            </li>
+            <li>
+              <strong>HTTP Response</strong> → Back to frontend
+            </li>
           </ol>
         </div>
       </main>
