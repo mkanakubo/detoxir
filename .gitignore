@@ -18,6 +18,9 @@ coverage/
 frontend/.next/
 frontend/out/
 
+# nestjs (backend)
+backend/dist/
+
 # production
 build/
 dist/
