@@ -1,6 +1,5 @@
 import './globals.css';
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -8,9 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`antialiased`}>
-          {children}
-      </body>
+      <body className={`antialiased`}>{children}</body>
     </html>
   );
 }
