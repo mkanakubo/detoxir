@@ -7,16 +7,26 @@ import TimerDisplay from './_components/TimerDisplay';
 import Chart from './_components/Chart';
 import Footer from './_components/Footer';
 
-
 export default function Home() {
   return (
     <main>
-      <Header/>
-      <MeasureStartButton/>
-      <DrinkImage/>
-      <TimerDisplay/>
-      <Chart/>
-      <Footer/>
+      <Header />
+      <MeasureStartButton />
+  
+
+      <section
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <DrinkImage />
+        <TimerDisplay />
+        
+      </section>
+
+      <Chart />
+      <Footer />
     </main>
   );
 }
