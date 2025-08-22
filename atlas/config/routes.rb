@@ -7,7 +7,8 @@ Rails.application.routes.draw do
 
   # API routes
   namespace :api, defaults: { format: :json } do
-    resources :product_identifications, only: [:index, :show]
+    resources :product_identifications, only: [ :index, :show ]
+    resources :users
   end
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
