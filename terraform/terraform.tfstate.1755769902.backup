@@ -1,0 +1,303 @@
+{
+  "version": 4,
+  "terraform_version": "1.13.0",
+  "serial": 8,
+  "lineage": "3c56d13f-b8d9-4a18-1b78-c84c89cf26e5",
+  "outputs": {
+    "artifact_registry_url": {
+      "value": "asia-northeast1-docker.pkg.dev/gcp-dev-432007/detoxir",
+      "type": "string"
+    },
+    "project_id": {
+      "value": "gcp-dev-432007",
+      "type": "string"
+    },
+    "region": {
+      "value": "asia-northeast1",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "google_artifact_registry_repository",
+      "name": "repo",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cleanup_policies": [],
+            "cleanup_policy_dry_run": false,
+            "create_time": "2025-08-21T09:46:22.431833Z",
+            "description": "Docker repository for detoxir",
+            "docker_config": [],
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "format": "DOCKER",
+            "id": "projects/gcp-dev-432007/locations/asia-northeast1/repositories/detoxir",
+            "kms_key_name": "",
+            "labels": {},
+            "location": "asia-northeast1",
+            "maven_config": [],
+            "mode": "STANDARD_REPOSITORY",
+            "name": "detoxir",
+            "project": "gcp-dev-432007",
+            "remote_repository_config": [],
+            "repository_id": "detoxir",
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null,
+            "update_time": "2025-08-21T09:49:42.039211Z",
+            "virtual_repository_config": [],
+            "vulnerability_scanning_config": [
+              {
+                "enablement_config": "",
+                "enablement_state": "SCANNING_ACTIVE",
+                "enablement_state_reason": ""
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_cloud_run_v2_service",
+      "name": "backend",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "status": "tainted",
+          "schema_version": 0,
+          "attributes": {
+            "annotations": {},
+            "binary_authorization": [],
+            "build_config": [],
+            "client": "",
+            "client_version": "",
+            "conditions": [
+              {
+                "execution_reason": "",
+                "last_transition_time": "2025-08-21T09:46:59.400404Z",
+                "message": "Revision 'detoxir-backend-00001-549' is not ready and cannot serve traffic. Image 'asia-northeast1-docker.pkg.dev/gcp-dev-432007/detoxir/detoxir-backend:latest' not found.",
+                "reason": "REVISION_FAILED",
+                "revision_reason": "",
+                "severity": "",
+                "state": "CONDITION_FAILED",
+                "type": "RoutesReady"
+              },
+              {
+                "execution_reason": "",
+                "last_transition_time": "2025-08-21T09:46:59.245134Z",
+                "message": "Image 'asia-northeast1-docker.pkg.dev/gcp-dev-432007/detoxir/detoxir-backend:latest' not found.",
+                "reason": "",
+                "revision_reason": "",
+                "severity": "",
+                "state": "CONDITION_SUCCEEDED",
+                "type": "ConfigurationsReady"
+              }
+            ],
+            "create_time": "2025-08-21T09:46:57.858738Z",
+            "creator": "renlijinjiubao808@gmail.com",
+            "custom_audiences": [],
+            "delete_time": "",
+            "deletion_protection": true,
+            "description": "",
+            "effective_annotations": {},
+            "effective_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "etag": "\"CJHWm8UGENCavZkD/cHJvamVjdHMvZ2NwLWRldi00MzIwMDcvbG9jYXRpb25zL2FzaWEtbm9ydGhlYXN0MS9zZXJ2aWNlcy9kZXRveGlyLWJhY2tlbmQ\"",
+            "expire_time": "",
+            "generation": "1",
+            "id": "projects/gcp-dev-432007/locations/asia-northeast1/services/detoxir-backend",
+            "ingress": "INGRESS_TRAFFIC_ALL",
+            "invoker_iam_disabled": false,
+            "labels": {},
+            "last_modifier": "renlijinjiubao808@gmail.com",
+            "latest_created_revision": "projects/gcp-dev-432007/locations/asia-northeast1/services/detoxir-backend/revisions/detoxir-backend-00001-549",
+            "latest_ready_revision": "",
+            "launch_stage": "GA",
+            "location": "asia-northeast1",
+            "name": "detoxir-backend",
+            "observed_generation": "1",
+            "project": "gcp-dev-432007",
+            "reconciling": false,
+            "scaling": [],
+            "template": [
+              {
+                "annotations": {},
+                "containers": [
+                  {
+                    "args": [],
+                    "base_image_uri": "",
+                    "build_info": [],
+                    "command": [],
+                    "depends_on": [],
+                    "env": [
+                      {
+                        "name": "DATABASE_URL",
+                        "value": "file:/app/data/dev.db",
+                        "value_source": []
+                      },
+                      {
+                        "name": "NODE_ENV",
+                        "value": "production",
+                        "value_source": []
+                      }
+                    ],
+                    "image": "asia-northeast1-docker.pkg.dev/gcp-dev-432007/detoxir/detoxir-backend:latest",
+                    "liveness_probe": [
+                      {
+                        "failure_threshold": 3,
+                        "grpc": [],
+                        "http_get": [
+                          {
+                            "http_headers": [],
+                            "path": "/health",
+                            "port": 3001
+                          }
+                        ],
+                        "initial_delay_seconds": 30,
+                        "period_seconds": 30,
+                        "tcp_socket": [],
+                        "timeout_seconds": 5
+                      }
+                    ],
+                    "name": "",
+                    "ports": [
+                      {
+                        "container_port": 3001,
+                        "name": "http1"
+                      }
+                    ],
+                    "resources": [
+                      {
+                        "cpu_idle": false,
+                        "limits": {
+                          "cpu": "1000m",
+                          "memory": "512Mi"
+                        },
+                        "startup_cpu_boost": false
+                      }
+                    ],
+                    "startup_probe": [
+                      {
+                        "failure_threshold": 3,
+                        "grpc": [],
+                        "http_get": [
+                          {
+                            "http_headers": [],
+                            "path": "/health",
+                            "port": 3001
+                          }
+                        ],
+                        "initial_delay_seconds": 30,
+                        "period_seconds": 10,
+                        "tcp_socket": [],
+                        "timeout_seconds": 5
+                      }
+                    ],
+                    "volume_mounts": [],
+                    "working_dir": ""
+                  }
+                ],
+                "encryption_key": "",
+                "execution_environment": "",
+                "gpu_zonal_redundancy_disabled": false,
+                "labels": {},
+                "max_instance_request_concurrency": 80,
+                "node_selector": [],
+                "revision": "",
+                "scaling": [
+                  {
+                    "max_instance_count": 10,
+                    "min_instance_count": 0
+                  }
+                ],
+                "service_account": "detoxir-cloud-run@gcp-dev-432007.iam.gserviceaccount.com",
+                "session_affinity": false,
+                "timeout": "300s",
+                "volumes": [],
+                "vpc_access": []
+              }
+            ],
+            "terminal_condition": [
+              {
+                "execution_reason": "",
+                "last_transition_time": "2025-08-21T09:46:59.400404Z",
+                "message": "Revision 'detoxir-backend-00001-549' is not ready and cannot serve traffic. Image 'asia-northeast1-docker.pkg.dev/gcp-dev-432007/detoxir/detoxir-backend:latest' not found.",
+                "reason": "REVISION_FAILED",
+                "revision_reason": "",
+                "severity": "",
+                "state": "CONDITION_FAILED",
+                "type": "Ready"
+              }
+            ],
+            "terraform_labels": {
+              "goog-terraform-provisioned": "true"
+            },
+            "timeouts": null,
+            "traffic": [
+              {
+                "percent": 100,
+                "revision": "",
+                "tag": "",
+                "type": "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+              }
+            ],
+            "traffic_statuses": [],
+            "uid": "192a62e5-d6f8-43c7-8a85-12659a87d3cf",
+            "update_time": "2025-08-21T09:46:57.858738Z",
+            "uri": "",
+            "urls": [
+              "https://detoxir-backend-845348887893.asia-northeast1.run.app"
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "google_artifact_registry_repository.repo",
+            "google_service_account.cloud_run_sa"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_service_account",
+      "name": "cloud_run_sa",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "detoxir-cloud-run",
+            "create_ignore_already_exists": null,
+            "description": "",
+            "disabled": false,
+            "display_name": "Cloud Run Service Account for detoxir",
+            "email": "detoxir-cloud-run@gcp-dev-432007.iam.gserviceaccount.com",
+            "id": "projects/gcp-dev-432007/serviceAccounts/detoxir-cloud-run@gcp-dev-432007.iam.gserviceaccount.com",
+            "member": "serviceAccount:detoxir-cloud-run@gcp-dev-432007.iam.gserviceaccount.com",
+            "name": "projects/gcp-dev-432007/serviceAccounts/detoxir-cloud-run@gcp-dev-432007.iam.gserviceaccount.com",
+            "project": "gcp-dev-432007",
+            "timeouts": null,
+            "unique_id": "110465924588820351868"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
