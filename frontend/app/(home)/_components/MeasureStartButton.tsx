@@ -1,6 +1,9 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 export default function MeasureStartButton() {
+  const router = useRouter();
+
   return (
     <button
       style={{
@@ -15,7 +18,7 @@ export default function MeasureStartButton() {
         cursor: "pointer",             
         transition: "all 0.2s ease",  
       }}
-      onClick={() => alert("（ダミー）計測開始しました")}
+      onClick={() =>router.push("/camera")}
     >
       START
     </button>
