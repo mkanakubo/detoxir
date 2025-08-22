@@ -65,9 +65,9 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onImageUpload }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4 text-center">バーコードスキャン</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
+      <div className="bg-black p-6 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold mb-4 text-center text-white">バーコードスキャン</h1>
         <div className="space-y-4">
           {image ? (
             <>
@@ -108,10 +108,10 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onImageUpload }) => {
                 />
                 {/* バーコードガイドライン */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="border-2 border-blue-500 w-64 h-32 rounded-lg"></div>
+                  <div className="border-4 border-lime-400 w-64 h-32 rounded-lg"></div>
                 </div>
               </div>
-              <p className="text-gray-600 text-center">
+              <p className="text-gray-300 text-center">
                 バーコードを枠内に合わせて撮影してください
               </p>
               <div className="flex justify-center">
