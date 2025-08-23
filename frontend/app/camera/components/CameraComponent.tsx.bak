@@ -1,0 +1,204 @@
+'use client';
+
+import React, { useRef, useState } from 'react';
+import Image from 'next/image';
+import Webcam from 'react-webcam';
+import { toast } from 'react-hot-toast';
+import dynamic from 'next/dynamic';
+
+// ZXingをクライアントサイドでのみ動作するように設定
+const ZXing = {
+  BrowserMultiFormatReader: dynamic(
+    () => import('@zxing/browser').then((mod) => mod.BrowserMultiFormatReader),
+    { ssr: false }
+  ),
+};lient';
+
+import React, { useRef, useState, useEffect } from 'react';
+import Image from 'next/image';
+import Webcam from 'react-webcam';
+import { toast } from 'react-hot-toast';;
+
+interface CameraComponentProps {
+  onImageUpload?: (success: boolean) => void;
+}
+
+const CameraComponent: React.FC<CameraComponentProps> = ({ onImageUpload }) => {
+  const webcamRef = useRef<Webcam>(null);
+  const [image, setImage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [scanResult, setScanResult] = useState<{
+    success: boolean;
+    barcodeText?: string;
+    message: string;
+  } | null>(null);
+
+  const videoConstraints = {
+    width: 1280,
+    height: 720,
+    facingMode: 'environment'
+  };
+
+  const capture = () => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      setImage(imageSrc);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!image) return;
+
+    try {
+      setIsUploading(true);
+      
+      // バーコードの検出を試みる
+      const { BrowserMultiFormatReader } = await import('@zxing/browser');
+      const reader = new BrowserMultiFormatReader();
+      
+      try {
+        // 画像をBlobに変換してバーコードを検出
+        const base64Data = image.split(',')[1];
+        const binaryString = window.atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const imageBlob = new Blob([bytes], { type: 'image/jpeg' });
+        const imageUrl = URL.createObjectURL(imageBlob);
+
+        // バーコードの検出を試みる
+        const result = await reader.decodeFromImageUrl(imageUrl);
+        URL.revokeObjectURL(imageUrl); // URLを解放
+
+        // FormDataの作成
+        const formData = new FormData();
+        formData.append('image', imageBlob, 'barcode.jpg');
+
+        // APIエンドポイントに画像を送信
+        const response = await fetch('/api/detect', {
+          method: 'POST',
+          body: formData,
+        });
+
+          const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'アップロードに失敗しました');
+        }
+
+        setScanResult({
+          success: true,
+          barcodeText: result.getText(),
+          message: 'バーコードの検出に成功しました'
+        });
+
+        toast.success('バーコードの検出に成功しました');
+
+        // 3秒後に画面をリセット
+        setTimeout(() => {
+          setImage(null);
+          setScanResult(null);
+        }, 3000);
+
+        onImageUpload?.(true);
+
+      } catch (barcodeError) {
+        setScanResult({
+          success: false,
+          message: 'バーコードを検出できませんでした。もう一度撮影してください。'
+        });
+        toast.error('バーコードを検出できませんでした');
+        onImageUpload?.(false);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('アップロードに失敗しました');
+      onImageUpload?.(false);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
+      <div className="bg-black p-6 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold mb-4 text-center text-white">バーコードスキャン</h1>
+        <div className="space-y-4">
+          {image ? (
+            <>
+              <div className="relative w-[640px] h-[480px]">
+                <Image
+                  src={image}
+                  alt="撮影した画像"
+                  fill
+                  className="object-contain rounded-lg"
+                />
+              </div>
+              <div className="space-y-4">
+                {scanResult && (
+                  <div className={`text-center p-4 rounded-lg ${
+                    scanResult.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    <p className="font-bold">{scanResult.message}</p>
+                    {scanResult.barcodeText && (
+                      <p className="mt-2">検出されたバーコード: {scanResult.barcodeText}</p>
+                    )}
+                  </div>
+                )}
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={() => {
+                      setImage(null);
+                      setScanResult(null);
+                    }}
+                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                    disabled={isUploading}
+                  >
+                    再撮影
+                  </button>
+                  <button
+                    onClick={handleUpload}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    disabled={isUploading}
+                  >
+                    {isUploading ? '解析中...' : 'バーコードを解析'}
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="relative">
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={videoConstraints}
+                  className="rounded-lg border"
+                />
+                {/* バーコードガイドライン */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="border-4 border-lime-400 w-64 h-32 rounded-lg"></div>
+                </div>
+              </div>
+              <p className="text-gray-300 text-center">
+                バーコードを枠内に合わせて撮影してください
+              </p>
+              <div className="flex justify-center">
+                <button
+                  onClick={capture}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  撮影
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CameraComponent;
