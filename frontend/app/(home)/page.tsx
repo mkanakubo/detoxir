@@ -30,7 +30,7 @@ export default function Home() {
           alignItems: "center",
         }}
       >
-        <DrinkImage />
+        <DrinkImage src={""} alt={""} />
         <TimerDisplay />
       </section>
       <Chart />
