@@ -38,13 +38,11 @@ export default function RootLayout({
 
       {/* 画面全体を「上=Header / 中=main / 下=Footer」の3段にする */}
       <body
-        className="antialiased"
+        className="antialiased bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white"
         style={{
           minHeight: "100dvh",
           display: "grid",
           gridTemplateRows: "auto 1fr auto",
-          background: "#1e1e1eff",
-          color: "#fff",
         }}
       >
         <Header />

@@ -122,10 +122,18 @@ export default function CameraComponent() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-2 sm:p-4">
-      <div className="bg-black p-3 sm:p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center text-white">バーコードスキャン</h1>
-        <div className="space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4">
+      <div className="w-full max-w-2xl">
+        {/* ヘッダー */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
+            バーコードスキャン
+          </h1>
+          <p className="text-gray-400 text-sm">商品のバーコードを読み取ってカフェイン量を確認</p>
+        </div>
+
+        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-gray-700/50 shadow-2xl">
+          <div className="space-y-6">
           {image ? (
             <>
               <div className="relative w-4/5 sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 aspect-video max-w-lg mx-auto mb-4">
@@ -245,6 +253,7 @@ export default function CameraComponent() {
               )}
             </>
           )}
+          </div>
         </div>
       </div>
     </div>
