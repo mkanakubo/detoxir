@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_22_163542) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_22_171054) do
+  create_table "caffeinated_products", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "jan_code", limit: 13
+    t.string "name"
+    t.integer "caffeine_amount_mg"
+    t.string "image", limit: 512
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["jan_code"], name: "index_caffeinated_products_on_jan_code", unique: true
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "auth0_id"
     t.string "name"
