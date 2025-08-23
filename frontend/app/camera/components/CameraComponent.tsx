@@ -9,7 +9,7 @@ export type CameraComponentProps = {
   onImageUpload?: (success: boolean, janCode?: string) => void;
 };
 
-export default function CameraComponent({ onImageUpload }: CameraComponentProps) {
+export default function CameraComponent() {
   const webcamRef = useRef<Webcam>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<string | null>(null);
@@ -81,44 +81,8 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
   };
 
   // 画像の前処理
-  const preprocessImage = async (imageData: string): Promise<string> => {
-    return new Promise((resolve) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = img.width;
-        canvas.height = img.height;
-        
-        
-        resolve(canvas.toDataURL('image/jpeg', 1.0));
-      };
-      img.src = imageData;
-    });
-  };
 
   // JANコードの検証
-  const validateJANCode = (code: string): boolean => {
-    // 数字以外の文字を削除
-    const digits = code.replace(/[^\d]/g, '');
-    
-    // 13桁または8桁のみを許可
-    if (digits.length !== 13 && digits.length !== 8) return false;
-
-    // チェックディジットの検証
-    const numbers = digits.split('').map(Number);
-    const checkDigit = numbers.pop()!;
-    let sum = 0;
-
-    numbers.reverse().forEach((num, index) => {
-      sum += num * (index % 2 ? 1 : 3);
-    });
-    
-
-    const calculatedCheck = (10 - (sum % 10)) % 10;
-    return checkDigit === calculatedCheck;
-  };
   
   // 再撮影
   const handleRetake = () => {
@@ -158,42 +122,42 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
-      <div className="bg-black p-6 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4 text-center text-white">バーコードスキャン</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-2 sm:p-4">
+      <div className="bg-black p-3 sm:p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center text-white">バーコードスキャン</h1>
         <div className="space-y-4">
           {image ? (
             <>
-              <div className="relative w-[640px] h-[480px]">
+              <div className="relative w-4/5 sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 aspect-video max-w-lg mx-auto mb-4">
                 <NextImage
                   src={image}
                   alt="撮影した画像"
                   fill
-                  className="object-contain rounded-lg"
+                  className="object-contain rounded-lg shadow-md"
                 />
               </div>
-              <div className="space-y-4">
+              <div className="space-y-4 w-full max-w-lg mx-auto px-4">
                 {result && (
-                  <div className={`text-center p-4 rounded-lg ${
+                  <div className={`text-center p-4 rounded-lg text-sm sm:text-base ${
                     result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
-                    <p className="font-bold">{result.message}</p>
+                    <p className="font-bold break-words">{result.message}</p>
                     {result.janCode && (
-                      <p className="mt-2">JANコード: {result.janCode}</p>
+                      <p className="mt-2 text-xs sm:text-sm font-mono">JANコード: {result.janCode}</p>
                     )}
                   </div>
                 )}
-                <div className="flex justify-center space-x-4">
+                <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4">
                   <button
                     onClick={handleRetake}
-                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto"
                   >
                     再撮影
                   </button>
                   {/* バーコードを解析ボタンは削除 */}
                   <button
                     onClick={handleServerAnalyze}
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto"
                   >
                     サーバで解析
                   </button>
@@ -217,9 +181,9 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
             <>
               {/* カメラエラーまたはiOSの場合の代替UI */}
               {(cameraError || isIOSDevice) && (
-                <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
-                  <p className="font-bold">カメラが利用できません</p>
-                  <p className="text-sm mt-1">
+                <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg max-w-lg mx-auto">
+                  <p className="font-bold text-sm sm:text-base">カメラが利用できません</p>
+                  <p className="text-xs sm:text-sm mt-1 break-words">
                     {isIOSDevice 
                       ? 'iOS端末では、ファイル選択機能をご利用ください。' 
                       : cameraError
@@ -240,7 +204,7 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg mb-4"
+                  className="w-full max-w-sm bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg mb-4 text-lg shadow-lg mx-auto"
                 >
                   📷 写真を撮影 / 選択
                 </button>
@@ -248,23 +212,23 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
 
               {/* Webカメラコンポーネント（エラーがない場合のみ表示） */}
               {!cameraError && (
-                <div className="relative">
+                <div className="relative w-full max-w-lg mx-auto">
                   <Webcam
                     audio={false}
                     ref={webcamRef}
                     screenshotFormat="image/jpeg"
                     videoConstraints={videoConstraints}
-                    className="rounded-lg border"
+                    className="rounded-lg border w-full h-auto"
                     onUserMediaError={handleCameraError}
                   />
                   {/* バーコードガイドライン */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="border-4 border-lime-400 w-64 h-32 rounded-lg"></div>
+                    <div className="border-4 border-lime-400 w-4/5 max-w-sm h-24 rounded-lg"></div>
                   </div>
                 </div>
               )}
               
-              <p className="text-gray-300 text-center">
+              <p className="text-gray-300 text-center text-sm sm:text-base px-4">
                 バーコードを枠内に合わせて撮影してください
               </p>
               
@@ -273,9 +237,9 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
                 <div className="flex justify-center">
                   <button
                     onClick={capture}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg shadow-lg w-full max-w-xs"
                   >
-                    撮影
+                    📷 撮影
                   </button>
                 </div>
               )}
