@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CaffeineCalculator
+class Calculation
   def get_adjusted_half_life(user)
     base_half_life = case user.age
                      when 0..20 then 240.0
@@ -203,68 +203,68 @@ class CaffeineCalculator
 end
 
 # === 使用例（Rails console内で実行してください） ===
-calculator = CaffeineCalculator.new
-
-# Userモデルのインスタンスを作成
-user = User.new(
-  weight_kg: 52.0,
-  age: 21,
-  name: "テストユーザー",
-  auth0_id: "test_user_calc"
-)
-
-now = Time.current
-
-# 段階的な摂取イベントを生成（30分間で10回に分割）
-first_drink_events = calculator.create_gradual_intake_events(
-  now.to_i,
-  142.0 # 142mgのカフェインを30分で分割摂取
-)
-
-puts '🔍 1杯目の摂取イベント開始...'
-puts "摂取開始時刻: #{now.strftime('%Y/%m/%d %H:%M:%S')}"
-puts "摂取完了時刻: #{(now + 27 * 60).strftime('%Y/%m/%d %H:%M:%S')}"
-
-# 1杯目摂取完了後の分析
-calculator.print_caffeine_analysis(first_drink_events, user, 1)
-
-# 5時間後に2回目の摂取イベントを生成
-second_drink_events = calculator.create_gradual_intake_events(
-  now.to_i + 300 * 60, # 5時間後に2回目の摂取開始
-  142.0 # 142mgのカフェインを30分で分割摂取
-)
-
-puts "\n🔍 2杯目の摂取イベント開始..."
-puts "摂取開始時刻: #{(now + 300 * 60).strftime('%Y/%m/%d %H:%M:%S')}"
-puts "摂取完了時刻: #{(now + (300 + 27) * 60).strftime('%Y/%m/%d %H:%M:%S')}"
-
-# 全ての摂取イベントを結合
-all_intake_event_history = first_drink_events + second_drink_events
-
-# 2杯目摂取完了後の分析（累積効果）
-calculator.print_caffeine_analysis(all_intake_event_history, user, 2)
-
-# 15分刻みで様々な時間後の濃度を計算
-time_points = []
-(0..12).step(0.5) { |hour| time_points.push(hour) }
-
-puts "\n📊 カフェイン濃度の時間推移（15分刻み）:"
-time_points.each do |hours|
-  concentration = calculator.calculate_concentration_after_hours(
-    hours,
-    all_intake_event_history,
-    user
-  )
-  puts "#{hours}時間後: #{concentration.round(3)} mg/kg"
-end
-
-puts "\n📈 特定時間の濃度計算:"
-specific_hours = [ 1.5, 3.5, 6.5, 10.5, 12.5, 15.5, 18, 24, 27, 55 ]
-specific_hours.each do |hours|
-  concentration = calculator.calculate_concentration_after_hours(
-    hours,
-    all_intake_event_history,
-    user
-  )
-  puts "#{hours}時間後: #{concentration.round(2)} mg/kg"
-end
+# calculator = Calculation.new
+# 
+# # Userモデルのインスタンスを作成
+# user = User.new(
+#   weight_kg: 52.0,
+#   age: 21,
+#   name: "テストユーザー",
+#   auth0_id: "test_user_calc"
+# )
+# 
+# now = Time.current
+# 
+# # 段階的な摂取イベントを生成（30分間で10回に分割）
+# first_drink_events = calculator.create_gradual_intake_events(
+#   now.to_i,
+#   142.0 # 142mgのカフェインを30分で分割摂取
+# )
+# 
+# puts '🔍 1杯目の摂取イベント開始...'
+# puts "摂取開始時刻: #{now.strftime('%Y/%m/%d %H:%M:%S')}"
+# puts "摂取完了時刻: #{(now + 27 * 60).strftime('%Y/%m/%d %H:%M:%S')}"
+# 
+# # 1杯目摂取完了後の分析
+# calculator.print_caffeine_analysis(first_drink_events, user, 1)
+# 
+# # 5時間後に2回目の摂取イベントを生成
+# second_drink_events = calculator.create_gradual_intake_events(
+#   now.to_i + 300 * 60, # 5時間後に2回目の摂取開始
+#   142.0 # 142mgのカフェインを30分で分割摂取
+# )
+# 
+# puts "\n🔍 2杯目の摂取イベント開始..."
+# puts "摂取開始時刻: #{(now + 300 * 60).strftime('%Y/%m/%d %H:%M:%S')}"
+# puts "摂取完了時刻: #{(now + (300 + 27) * 60).strftime('%Y/%m/%d %H:%M:%S')}"
+# 
+# # 全ての摂取イベントを結合
+# all_intake_event_history = first_drink_events + second_drink_events
+# 
+# # 2杯目摂取完了後の分析（累積効果）
+# calculator.print_caffeine_analysis(all_intake_event_history, user, 2)
+# 
+# # 15分刻みで様々な時間後の濃度を計算
+# time_points = []
+# (0..12).step(0.5) { |hour| time_points.push(hour) }
+# 
+# puts "\n📊 カフェイン濃度の時間推移（15分刻み）:"
+# time_points.each do |hours|
+#   concentration = calculator.calculate_concentration_after_hours(
+#     hours,
+#     all_intake_event_history,
+#     user
+#   )
+#   puts "#{hours}時間後: #{concentration.round(3)} mg/kg"
+# end
+# 
+# puts "\n📈 特定時間の濃度計算:"
+# specific_hours = [ 1.5, 3.5, 6.5, 10.5, 12.5, 15.5, 18, 24, 27, 55 ]
+# specific_hours.each do |hours|
+#   concentration = calculator.calculate_concentration_after_hours(
+#     hours,
+#     all_intake_event_history,
+#     user
+#   )
+#   puts "#{hours}時間後: #{concentration.round(2)} mg/kg"
+# end
