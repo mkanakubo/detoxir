@@ -1,0 +1,61 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.label {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* セレクトボックス用の見た目 */
+.select {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 12px; /* 右に少し余白（▼用） */
+  border-radius: 10px;
+  border: 2px solid #39ff14;
+  background: #1e1e1e;
+  color: #ffffff;
+  outline: none;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+  /* ブラウザ標準の矢印を消してカスタムに寄せる */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* 右側に簡易の▼（SVG）を背景で描く */
+  background-image:
+    linear-gradient(transparent, transparent),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='white'><path d='M5 7l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px 14px;
+}
+
+.select:focus {
+  border-color: #6bff5a;
+  box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.15);
+  transform: translateY(-1px);
+}
+
+/* キーボード操作時の見やすさ */
+.select:focus-visible {
+  outline: none;
+}
+
+/* optgroupのラベル文字色を薄く */
+.select optgroup {
+  color: #c8c8c8;
+  font-weight: 700;
+}
+
+/* option の見やすさ（ブラウザ依存で反映されない場合あり） */
+.select option {
+  color: #ffffff;
+  background: #1e1e1e;
+}
