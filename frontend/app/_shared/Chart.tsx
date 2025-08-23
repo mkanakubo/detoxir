@@ -90,70 +90,147 @@ export default function Chart({ sleepTime = "22:00", startTime = "18:00" }: Prop
   const sleepOffset = diffMinutesForward(startTime, sleepTime);
 
   return (
-    <div
-      style={{
-        width: "90%",
-        marginLeft: "5%",
-        marginBottom: "20px",
-        borderRadius: "10px",
-        border: "2px solid #39FF14",
-        backgroundColor: "#1e1e1e",
-        color: "#888",
-        padding: "8px",
-        boxSizing: "border-box",
-        height: 380,
-      }}
-    >
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={dataWithOffset}
-          margin={{ top: 20, right: 20, bottom: 10, left: -40 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+    <div className="relative">
+      {/* グロー効果 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-blue-500/10 rounded-2xl blur-xl"></div>
+      
+      {/* メインチャート容器 */}
+      <div className="relative bg-gray-800/40 backdrop-blur-lg border border-gray-600/30 rounded-2xl p-6 shadow-2xl">
+        {/* ヘッダー */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-white flex items-center">
+              <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mr-3 animate-pulse"></div>
+              カフェイン濃度推移
+            </h3>
+            <div className="flex items-center space-x-2 text-xs text-gray-400">
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span>濃度レベル</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                <span>就寝時間</span>
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-gray-400">体内のカフェイン濃度の変化をリアルタイムで確認</p>
+        </div>
 
-          {/* ★ X軸は "数値" として扱い、等間隔（毎時）tick を自前で指定 */}
-          <XAxis
-            dataKey="t"          // 数値キー
-            type="number"        // 数値軸にするのがコツ
-            domain={[0, maxOffset]}
-            ticks={ticks}        // 0,60,120... の等間隔
-            stroke="#bbb"
-            tickFormatter={(v) => addMinutesAsHHMM(startTime, Number(v))} // 表示は HH:MM
-          />
+        {/* チャートエリア */}
+        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-700/30" style={{ height: 320 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={dataWithOffset}
+              margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
+            >
+              {/* グラデーション定義 */}
+              <defs>
+                <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#10B981" />
+                  <stop offset="50%" stopColor="#34D399" />
+                  <stop offset="100%" stopColor="#6EE7B7" />
+                </linearGradient>
+              </defs>
 
-          <YAxis
-            stroke="#bbb"
-            domain={[0, 3.0]}
-            ticks={[1.0, 2.0, 3.0]}
-          />
+              {/* グリッド */}
+              <CartesianGrid 
+                strokeDasharray="2 4" 
+                stroke="#374151" 
+                strokeOpacity={0.3}
+                vertical={false}
+              />
 
-          <Tooltip
-            contentStyle={{ background: "#121212", border: "1px solid #2a2a2a", borderRadius: 8 }}
-            labelStyle={{ color: "#ddd" }}
-            itemStyle={{ color: "#ddd" }}
-            // ラベル（X）の表示を HH:MM に
-            labelFormatter={(value) => addMinutesAsHHMM(startTime, Number(value))}
-          />
+              {/* X軸 */}
+              <XAxis
+                dataKey="t"
+                type="number"
+                domain={[0, maxOffset]}
+                ticks={ticks}
+                stroke="#9CA3AF"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v) => addMinutesAsHHMM(startTime, Number(v))}
+              />
 
-          {/* 濃度の折れ線（データが飛んでいてもXは等間隔） */}
-          <Line
-            type="monotone"
-            dataKey="concentration"
-            stroke="#39FF14"
-            strokeWidth={2.5}
-            dot={{ r: 4, fill: "#39FF14" }}
-            activeDot={{ r: 6 }}
-          />
+              {/* Y軸 */}
+              <YAxis
+                stroke="#9CA3AF"
+                fontSize={12}
+                domain={[0, 3.0]}
+                ticks={[0, 1.0, 2.0, 3.0]}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `${value}mg/L`}
+              />
 
-          {/* 就寝時間の縦線：X も分数（sleepOffset）で指定 */}
-          <ReferenceLine
-            x={sleepOffset}
-            stroke="red"
-            strokeWidth={2}
-            label={{ value: "就寝", position: "top", fill: "#888" }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+              {/* ツールチップ */}
+              <Tooltip
+                contentStyle={{ 
+                  background: 'rgba(17, 24, 39, 0.95)', 
+                  border: '1px solid rgba(75, 85, 99, 0.5)', 
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                }}
+                labelStyle={{ color: "#F3F4F6", fontWeight: '600' }}
+                itemStyle={{ color: "#10B981" }}
+                labelFormatter={(value) => `時刻: ${addMinutesAsHHMM(startTime, Number(value))}`}
+                formatter={(value) => [`${value} mg/L`, 'カフェイン濃度']}
+              />
+
+              {/* メインライン */}
+              <Line
+                type="monotone"
+                dataKey="concentration"
+                stroke="url(#lineGradient)"
+                strokeWidth={3}
+                dot={{ 
+                  r: 5, 
+                  fill: "#10B981", 
+                  strokeWidth: 2, 
+                  stroke: "#065F46" 
+                }}
+                activeDot={{ 
+                  r: 7, 
+                  fill: "#34D399",
+                  strokeWidth: 3,
+                  stroke: "#065F46",
+                  filter: "drop-shadow(0 0 8px rgba(52, 211, 153, 0.5))"
+                }}
+              />
+
+              {/* 就寝時間の縦線 */}
+              <ReferenceLine
+                x={sleepOffset}
+                stroke="#EF4444"
+                strokeWidth={2}
+                strokeDasharray="4 4"
+                label={{ 
+                  value: "💤 就寝", 
+                  position: "top", 
+                  fill: "#EF4444",
+                  fontSize: 12,
+                  fontWeight: 600
+                }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* フッター情報 */}
+        <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center space-x-4">
+            <span>🎯 目標: 2.0mg/L以下</span>
+            <span>⚡ 代謝率: 85%</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span>リアルタイム更新</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
