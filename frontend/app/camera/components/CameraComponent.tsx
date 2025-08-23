@@ -24,8 +24,8 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
 
   // ビデオの設定
   const videoConstraints = {
-    width: 1280,
-    height: 720,
+    width: 640,
+    height: 480,
     facingMode: 'environment'
   };
 
