@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
-import MeasureStartButton from './_components/MeasureStartButton';
-import DrinkImage from '../_shared/DrinkImage';
-import TimerDisplay from '../_shared/TimerDisplay';
-import Chart from '../_shared/Chart';
-
+import DrinkImage from  "../_shared/DrinkImage";
+import TimerDisplay from "../_shared/TimerDisplay";
+import Chart from "@/app/_shared/Chart";
+import ReadyButton from "./_components/ReadyButton";
 
 export default function Home() {
   return (
     <main>
-      <MeasureStartButton />
+      
       <section
         style={{
           display: "flex",
@@ -21,6 +20,7 @@ export default function Home() {
         
       </section>
       <Chart />
+      <ReadyButton />
     </main>
   );
 }

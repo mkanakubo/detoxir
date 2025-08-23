@@ -27,7 +27,7 @@ export default function Footer() {
           }}
         >
           <li>
-            <Link href="/dashboard" aria-label="Dashboard" style={{ color: "#39FF14" }}>
+            <Link href="/" aria-label="Dashboard" style={{ color: "#39FF14" }}>
               <LayoutDashboard size={28} />
             </Link>
           </li>
