@@ -79,5 +79,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 8080
-# Add debug output before starting Rails
-CMD ["/bin/bash", "-c", "echo 'Starting Rails application...' && echo 'Environment variables:' && env | grep -E '^(RAILS|DATABASE|SECRET)' && echo 'Starting server...' && bundle exec rails server -p 8080 -v"]
+CMD ["./bin/thrust", "./bin/rails", "server", "-p", "8080"]
