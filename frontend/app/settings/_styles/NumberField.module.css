@@ -1,0 +1,74 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.valueBadge {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #39ff14;
+  letter-spacing: 0.02em;
+}
+
+.unit {
+  color: #a1a1a1;
+  margin-left: 6px;
+  font-size: 0.9rem;
+}
+
+/* スライダー本体 */
+.range {
+  width: 100%;
+  height: 8px;
+  border-radius: 10px;
+  border: 2px solid #39ff14;
+  background: #0a0a0a;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #39ff14;
+  border: 2px solid #1e1e1e;
+  cursor: pointer;
+}
+
+
+.stepperRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn {
+  flex: 1;
+  height: 40px;
+  border-radius: 10px;
+  border: 2px solid #39ff14;
+  background: #1e1e1e;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}

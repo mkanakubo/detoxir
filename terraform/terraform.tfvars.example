@@ -1,0 +1,21 @@
+# Google Cloud Project Configuration
+project_id = "YOUR_PROJECT_ID_HERE"
+region     = "asia-northeast1"
+
+# Application Configuration
+app_name    = "detoxir"
+environment = "prod"
+
+# Database Configuration
+database_name     = "detoxir"
+database_user     = "detoxir_user"
+database_password = "YOUR_SECURE_PASSWORD_HERE"
+
+# Cloud Run Configuration
+min_scale    = 0
+max_scale    = 10
+cpu_limit    = "1000m"
+memory_limit = "512Mi"
+
+# Container Image (will be updated by CI/CD)
+container_image = "asia-northeast1-docker.pkg.dev/YOUR_PROJECT_ID_HERE/detoxir/detoxir-backend:latest"

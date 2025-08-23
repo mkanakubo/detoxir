@@ -1,0 +1,150 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'terraform/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'terraform/**'
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-northeast1
+  SERVICE_NAME: detoxir-backend
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Run linter
+      run: pnpm run lint
+      
+    - name: Run tests
+      run: pnpm run test
+      
+    - name: Build application
+      run: pnpm run build
+
+  build-and-deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      
+    - name: Configure Docker to use gcloud as credential helper
+      run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+      
+    - name: Build Docker image
+      run: |
+        cd backend
+        docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+        docker tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+                   ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:latest
+        
+    - name: Push Docker image
+      run: |
+        docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:${{ github.sha }}
+        docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:latest
+        
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.7.0"
+        
+    - name: Terraform Init
+      run: |
+        cd terraform
+        terraform init
+        
+    - name: Terraform Plan
+      run: |
+        cd terraform
+        terraform plan \
+          -var="project_id=${{ env.PROJECT_ID }}" \
+          -var="database_password=${{ secrets.DB_PASSWORD }}" \
+          -var="container_image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          
+    - name: Terraform Apply
+      run: |
+        cd terraform
+        terraform apply -auto-approve \
+          -var="project_id=${{ env.PROJECT_ID }}" \
+          -var="database_password=${{ secrets.DB_PASSWORD }}" \
+          -var="container_image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          
+    - name: Get service URL
+      id: service-url
+      run: |
+        cd terraform
+        echo "url=$(terraform output -raw service_url)" >> $GITHUB_OUTPUT
+        
+    - name: Run database migrations
+      run: |
+        # Get the latest deployed image and run migrations
+        gcloud run jobs create migration-job-${{ github.sha }} \
+          --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/detoxir/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+          --region=${{ env.REGION }} \
+          --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+          --command="pnpm,prisma,migrate,deploy" \
+          --service-account=detoxir-cloud-run@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
+          --max-retries=1 \
+          --parallelism=1 \
+          --task-count=1
+        
+        gcloud run jobs execute migration-job-${{ github.sha }} --region=${{ env.REGION }} --wait
+        
+        # Clean up job
+        gcloud run jobs delete migration-job-${{ github.sha }} --region=${{ env.REGION }} --quiet
+        
+    - name: Health check
+      run: |
+        sleep 30
+        curl -f ${{ steps.service-url.outputs.url }}/health || exit 1
+        
+    - name: Deploy summary
+      run: |
+        echo "🚀 Deployment successful!"
+        echo "Service URL: ${{ steps.service-url.outputs.url }}"
+        echo "Health check: ${{ steps.service-url.outputs.url }}/health"
