@@ -56,12 +56,12 @@ function buildHourlyTicks(maxOffsetMin: number): number[] {
 const rawData = [
   { time: "18:00", concentration: 0.5 },
   { time: "19:00", concentration: 1.2 },
-  { time: "20:53", concentration: 2.8 },
+  { time: "20:53", concentration: 4.8 },
   { time: "21:12", concentration: 3.5 },
-  { time: "22:00", concentration: 4.0 },
+  { time: "22:00", concentration: 3.0 },
   // 23:00, 24:00, 01:00, 02:00, 03:00 は欠けている
   { time: "04:46", concentration: 0.3 },
-  { time: "05:12", concentration: 0.1 },
+  { time: "05:12", concentration: 2.1 },
   { time: "06:00", concentration: 0.0 },
 ];
 
@@ -94,7 +94,7 @@ export default function Chart({ sleepTime = "22:00", startTime = "18:00" }: Prop
       style={{
         width: "90%",
         marginLeft: "5%",
-        marginBottom: "60px",
+        marginBottom: "20px",
         borderRadius: "10px",
         border: "2px solid #39FF14",
         backgroundColor: "#1e1e1e",
@@ -123,8 +123,8 @@ export default function Chart({ sleepTime = "22:00", startTime = "18:00" }: Prop
 
           <YAxis
             stroke="#bbb"
-            domain={[0, 4.5]}
-            ticks={[1.0, 2.0, 3.0, 4.0]}
+            domain={[0, 3.0]}
+            ticks={[1.0, 2.0, 3.0]}
           />
 
           <Tooltip

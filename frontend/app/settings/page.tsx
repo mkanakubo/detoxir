@@ -25,7 +25,14 @@ export default function SettingsPage() {
         <SleepTimeField value={sleepTime} onChange={setSleepTime} />
 
         {/* カード右下の保存ボタン */}
-        <button className={page.saveBtn}>保存</button>
+       <button  
+          className={page.saveBtn}
+          onClick={() => {
+           alert("保存しました！");
+           }}
+          >
+        保存
+       </button>
       </section>
     </main>
   );
