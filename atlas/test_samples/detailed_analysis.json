@@ -1,0 +1,19 @@
+{
+  "user_id": 1,
+  "intake_history": [
+    {
+      "time_unix": 1724400000,
+      "caffeine_mg": 95.0
+    },
+    {
+      "time_unix": 1724410800,
+      "caffeine_mg": 80.0
+    },
+    {
+      "time_unix": 1724425200,
+      "caffeine_mg": 120.0
+    }
+  ],
+  "analysis_hours": 18,
+  "base_time": 1724400000
+}
