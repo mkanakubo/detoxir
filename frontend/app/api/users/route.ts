@@ -21,8 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // バックエンドAPIにデータを送信
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/v1/users`, {
+    const response = await fetch(`https://atlas-api-845348887893.asia-northeast1.run.app/api/v1/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
