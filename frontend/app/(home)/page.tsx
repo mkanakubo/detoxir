@@ -26,10 +26,6 @@ export default function Home() {
       {/* ヘッダーエリア */}
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
-            Detoxir
-          </h1>
-          <p className="text-gray-400 text-sm">カフェイン摂取量を管理しよう</p>
         </div>
 
         {/* START ボタン */}

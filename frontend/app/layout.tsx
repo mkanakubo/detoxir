@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: "Detoxir",
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
-    apple: [{ url: "favicon.ico", sizes: "180x180" }],
+    icon: "/detoxir/logo.webp",
+    apple: [{ url: "/detoxir/logo.webp", sizes: "180x180" }],
   },
   other: {
     'apple-mobile-web-app-capable': 'yes',
@@ -33,7 +33,7 @@ export default function RootLayout({
     <html lang="ja">
       <head>
         {/* 上の metadata.icons と重複しても動きますが、どちらか片方でOK */}
-        <link rel="apple-touch-icon" sizes="180x180" href="favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/detoxir/logo.webp" />
       </head>
 
       {/* 画面全体を「上=Header / 中=main / 下=Footer」の3段にする */}

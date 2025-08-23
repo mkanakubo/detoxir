@@ -122,17 +122,17 @@ export default function CameraComponent() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-2xl">
         {/* ヘッダー */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
             バーコードスキャン
           </h1>
-          <p className="text-gray-400 text-sm">商品のバーコードを読み取ってカフェイン量を確認</p>
+          <p className="text-slate-400 text-sm font-medium">商品のバーコードを読み取ってカフェイン量を確認</p>
         </div>
 
-        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-gray-700/50 shadow-2xl">
+        <div className="bg-slate-700/20 backdrop-blur-lg rounded-2xl p-6 border border-slate-600/25 shadow-2xl">
           <div className="space-y-6">
           {image ? (
             <>
@@ -146,39 +146,41 @@ export default function CameraComponent() {
               </div>
               <div className="space-y-4 w-full max-w-lg mx-auto px-4">
                 {result && (
-                  <div className={`text-center p-4 rounded-lg text-sm sm:text-base ${
-                    result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  <div className={`text-center p-4 rounded-xl text-sm sm:text-base backdrop-blur-sm border ${
+                    result.success 
+                      ? 'bg-emerald-500/20 text-emerald-100 border-emerald-400/30' 
+                      : 'bg-red-500/20 text-red-100 border-red-400/30'
                   }`}>
                     <p className="font-bold break-words">{result.message}</p>
                     {result.janCode && (
-                      <p className="mt-2 text-xs sm:text-sm font-mono">JANコード: {result.janCode}</p>
+                      <p className="mt-2 text-xs sm:text-sm font-mono opacity-90">JANコード: {result.janCode}</p>
                     )}
                   </div>
                 )}
-                <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
                   <button
                     onClick={handleRetake}
-                    className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto"
+                    className="bg-slate-600/50 hover:bg-slate-500/60 text-white font-semibold py-3 px-6 rounded-xl w-full sm:w-auto backdrop-blur-sm border border-slate-500/30 transition-all duration-300 hover:scale-105"
                   >
                     再撮影
                   </button>
                   {/* バーコードを解析ボタンは削除 */}
                   <button
                     onClick={handleServerAnalyze}
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto"
+                    className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl w-full sm:w-auto transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-emerald-500/25"
                   >
                     サーバで解析
                   </button>
                 </div>
                 {/* サーバOCR結果表示 */}
                 {serverJanCode && (
-                  <div className="bg-blue-100 text-blue-800 p-4 rounded mt-4 text-center">
+                  <div className="bg-cyan-500/20 text-cyan-100 p-4 rounded-xl mt-4 text-center backdrop-blur-sm border border-cyan-400/30">
                     <p className="font-bold">サーバOCR結果</p>
-                    <p className="mt-2">JANコード: {serverJanCode}</p>
+                    <p className="mt-2 font-mono">JANコード: {serverJanCode}</p>
                   </div>
                 )}
                 {serverError && (
-                  <div className="bg-red-100 text-red-800 p-4 rounded mt-4 text-center">
+                  <div className="bg-red-500/20 text-red-100 p-4 rounded-xl mt-4 text-center backdrop-blur-sm border border-red-400/30">
                     <p className="font-bold">サーバOCRエラー</p>
                     <p className="mt-2">{serverError}</p>
                   </div>
@@ -189,9 +191,9 @@ export default function CameraComponent() {
             <>
               {/* カメラエラーまたはiOSの場合の代替UI */}
               {(cameraError || isIOSDevice) && (
-                <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg max-w-lg mx-auto">
+                <div className="mb-4 p-4 bg-amber-500/20 text-amber-100 rounded-xl max-w-lg mx-auto backdrop-blur-sm border border-amber-400/30">
                   <p className="font-bold text-sm sm:text-base">カメラが利用できません</p>
-                  <p className="text-xs sm:text-sm mt-1 break-words">
+                  <p className="text-xs sm:text-sm mt-1 break-words opacity-90">
                     {isIOSDevice 
                       ? 'iOS端末では、ファイル選択機能をご利用ください。' 
                       : cameraError
@@ -201,7 +203,7 @@ export default function CameraComponent() {
               )}
               
               {/* ファイル選択UI */}
-              <div className="mb-4">
+              <div className="mb-6">
                 <input
                   type="file"
                   accept="image/*"
@@ -212,9 +214,10 @@ export default function CameraComponent() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full max-w-sm bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg mb-4 text-lg shadow-lg mx-auto"
+                  className="w-full max-w-sm bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold py-4 px-6 rounded-xl mb-4 text-lg shadow-lg mx-auto transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
                 >
-                  📷 写真を撮影 / 選択
+                  <span className="text-xl">📷</span>
+                  <span>写真を撮影 / 選択</span>
                 </button>
               </div>
 
@@ -226,17 +229,18 @@ export default function CameraComponent() {
                     ref={webcamRef}
                     screenshotFormat="image/jpeg"
                     videoConstraints={videoConstraints}
-                    className="rounded-lg border w-full h-auto"
+                    className="rounded-xl border border-slate-600/30 w-full h-auto shadow-lg"
                     onUserMediaError={handleCameraError}
                   />
                   {/* バーコードガイドライン */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="border-4 border-lime-400 w-4/5 max-w-sm h-24 rounded-lg"></div>
+                    <div className="border-4 border-emerald-400 w-4/5 max-w-sm h-24 rounded-lg shadow-lg">
+                    </div>
                   </div>
                 </div>
               )}
               
-              <p className="text-gray-300 text-center text-sm sm:text-base px-4">
+              <p className="text-slate-300 text-center text-sm sm:text-base px-4 font-medium">
                 バーコードを枠内に合わせて撮影してください
               </p>
               
@@ -245,9 +249,10 @@ export default function CameraComponent() {
                 <div className="flex justify-center">
                   <button
                     onClick={capture}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg shadow-lg w-full max-w-xs"
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg w-full max-w-xs transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
                   >
-                    📷 撮影
+                    <span className="text-xl">�</span>
+                    <span>撮影</span>
                   </button>
                 </div>
               )}

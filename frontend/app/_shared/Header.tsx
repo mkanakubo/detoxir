@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Zap, User } from "lucide-react";
+import { User } from "lucide-react";
 import { useUser } from '@auth0/nextjs-auth0';
 
 export default function Header() {
@@ -16,17 +16,22 @@ export default function Header() {
         {/* ロゴエリア */}
         <Link href="/" className="flex items-center space-x-3 group">
           <div className="relative">
-            {/* アイコンのグロー効果 */}
+            {/* ロゴ画像のグロー効果 */}
             <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 rounded-xl blur-md opacity-60 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative bg-gradient-to-r from-green-400 to-blue-500 p-2 rounded-xl">
-              <Zap size={24} className="text-gray-900" />
+            <div className="relative bg-gradient-to-r from-green-400 to-blue-500 p-3 rounded-xl">
+              <Image
+                src="/detoxir/logo.webp"
+                alt="Detoxir Logo"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
             </div>
           </div>
           <div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
               Detoxir
             </h1>
-            <p className="text-xs text-gray-400 -mt-1">Caffeine Tracker</p>
           </div>
         </Link>
 
