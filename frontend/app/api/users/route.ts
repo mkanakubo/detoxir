@@ -22,14 +22,14 @@ export async function POST(request: NextRequest) {
 
     // バックエンドAPIにデータを送信
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/users`, {
+    const response = await fetch(`${backendUrl}/api/v1/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         auth0_id: sub,
-        weight: parseFloat(weight),
+        weight_kg: parseFloat(weight),
         age: parseInt(age),
         sleepTime,
       }),
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
 
     // バックエンドからユーザーデータを取得
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/users/${sub}`, {
+    const response = await fetch(`${backendUrl}/api/v1/users?auth0_id=${encodeURIComponent(sub)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
