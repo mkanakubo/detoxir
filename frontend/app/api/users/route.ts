@@ -1,92 +1,114 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const GRAPHQL_ENDPOINT = 'http://localhost:3001/graphql';
-
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
-    const query = `
-      query {
-        users {
-          id
-          name
-          email
-        }
-      }
-    `;
+    const body = await request.json();
+    const { sub, weight, age, sleepTime } = body;
 
-    const response = await fetch(GRAPHQL_ENDPOINT, {
+    // バリデーション
+    if (!sub) {
+      return NextResponse.json(
+        { error: 'User sub is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!weight || !age || !sleepTime) {
+      return NextResponse.json(
+        { error: 'Weight, age, and sleep time are required' },
+        { status: 400 }
+      );
+    }
+
+    // バックエンドAPIにデータを送信
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        query,
+        auth0_id: sub,
+        weight: parseFloat(weight),
+        age: parseInt(age),
+        sleepTime,
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.text();
+      console.error('Backend API error:', errorData);
+      return NextResponse.json(
+        { error: 'Failed to save user data to backend' },
+        { status: 500 }
+      );
     }
 
-    const data = await response.json();
+    const userData = await response.json();
 
-    if (data.errors) {
-      throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
-    }
+    return NextResponse.json({
+      success: true,
+      message: 'User data saved successfully',
+      data: userData,
+    });
 
-    return NextResponse.json(data.data.users);
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('API error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch users' },
-      { status: 500 },
+      { error: 'Internal server error' },
+      { status: 500 }
     );
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { name, email } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const sub = searchParams.get('sub');
 
-    const mutation = `
-      mutation CreateUser($input: CreateUserInput!) {
-        createUser(input: $input) {
-          id
-          name
-          email
-        }
-      }
-    `;
+    if (!sub) {
+      return NextResponse.json(
+        { error: 'User sub is required' },
+        { status: 400 }
+      );
+    }
 
-    const response = await fetch(GRAPHQL_ENDPOINT, {
-      method: 'POST',
+    // バックエンドからユーザーデータを取得
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/users/${sub}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        query: mutation,
-        variables: {
-          input: { name, email },
-        },
-      }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.status === 404) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404 }
+        );
+      }
+      const errorData = await response.text();
+      console.error('Backend API error:', errorData);
+      return NextResponse.json(
+        { error: 'Failed to fetch user data from backend' },
+        { status: 500 }
+      );
     }
 
-    const data = await response.json();
+    const userData = await response.json();
 
-    if (data.errors) {
-      throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
-    }
+    return NextResponse.json({
+      success: true,
+      data: userData,
+    });
 
-    return NextResponse.json(data.data.createUser);
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('API error:', error);
     return NextResponse.json(
-      { error: 'Failed to create user' },
-      { status: 500 },
+      { error: 'Internal server error' },
+      { status: 500 }
     );
   }
 }

@@ -99,10 +99,6 @@ export default function Chart({ sleepTime = "22:00", startTime = "18:00" }: Prop
         {/* ヘッダー - よりコンパクトに */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-1">
-            <h3 className="text-xl font-semibold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent flex items-center">
-              <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full mr-2 animate-pulse"></div>
-              カフェイン濃度推移
-            </h3>
             <div className="flex items-center space-x-3 text-xs text-slate-400">
               <div className="flex items-center space-x-1">
                 <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>

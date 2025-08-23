@@ -37,7 +37,7 @@ export default function Home() {
             <DrinkImage src={""} alt={""} />
             <TimerDisplay />
           </div>
-          
+
           {/* ステータス表示 */}
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="bg-gray-700/50 rounded-xl p-3">

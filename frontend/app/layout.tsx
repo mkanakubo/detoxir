@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from "next";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import Header from "./_shared/Header";
 import Footer from "./_shared/Footer";
@@ -48,6 +49,31 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Footer />
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: 'rgba(15, 23, 42, 0.95)',
+              color: '#F1F5F9',
+              border: '1px solid rgba(71, 85, 105, 0.5)',
+              borderRadius: '12px',
+              backdropFilter: 'blur(12px)',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#F1F5F9',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#F1F5F9',
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );

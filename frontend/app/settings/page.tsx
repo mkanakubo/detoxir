@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Undo2, Save, User, Clock, Weight } from "lucide-react";
+import { toast } from "react-hot-toast";
 import WeightField from "./_components/WeightField";
 import AgeField from "./_components/AgeField";
 import SleepTimeField from "./_components/SleepTimeField";
@@ -11,6 +12,46 @@ export default function SettingsPage() {
   const [weight, setWeight] = useState("");
   const [age, setAge] = useState("");
   const [sleepTime, setSleepTime] = useState("23:00");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    // 仮のユーザーID（Auth0実装時に user.sub に変更）
+    const userSub = "demo-user-" + Date.now();
+
+    if (!weight || !age || !sleepTime) {
+      toast.error("すべての項目を入力してください");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sub: userSub,
+          weight,
+          age,
+          sleepTime,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast.success("設定を保存しました！");
+      } else {
+        toast.error(data.error || "保存に失敗しました");
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error("保存中にエラーが発生しました");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 p-4 pb-24">
@@ -81,15 +122,20 @@ export default function SettingsPage() {
             {/* 保存ボタン */}
             <div className="mt-8">
               <button  
-                className="w-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center space-x-3 border border-emerald-400/30"
-                onClick={() => {
-                  alert("保存しました！");
-                }}
+                className="w-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center space-x-3 border border-emerald-400/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                onClick={handleSave}
+                disabled={isSaving}
               >
                 <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Save size={16} />
+                  {isSaving ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <Save size={16} />
+                  )}
                 </div>
-                <span className="text-lg">設定を保存</span>
+                <span className="text-lg">
+                  {isSaving ? "保存中..." : "設定を保存"}
+                </span>
               </button>
             </div>
 
@@ -97,11 +143,13 @@ export default function SettingsPage() {
             <div className="mt-6 p-6 bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-600/25">
               <h4 className="text-sm font-semibold text-slate-200 mb-3 flex items-center">
                 <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mr-3"></div>
-                プライバシー保護
+                データ管理について
               </h4>
-              <p className="text-sm text-slate-400 leading-relaxed">
-                入力された情報はローカルに保存され、カフェイン代謝計算にのみ使用されます。データは外部に送信されることはありません。
-              </p>
+              <div className="space-y-2 text-sm text-slate-400 leading-relaxed">
+                <p>• 入力された情報はバックエンドサーバーに安全に保存されます</p>
+                <p>• カフェイン代謝計算と個人の健康管理にのみ使用されます</p>
+                <p>• データは暗号化されて保護されます</p>
+              </div>
             </div>
           </div>
         </div>
