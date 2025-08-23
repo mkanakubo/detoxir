@@ -18,9 +18,21 @@ class JanCodeApiClient
     test_data = get_test_product_data(jan_code)
     return test_data if test_data
     
+    # APIが失敗した場合、Webサイトをスクレイピング
+    scraped_data = scrape_jancode_website(jan_code)
+    return scraped_data if scraped_data
+    
+    # 従来のAPI呼び出し（バックアップ）
     uri = URI("#{BASE_URL}/#{jan_code}")
     response = make_http_request(uri)
     return nil unless response
+
+    # HTMLレスポンスの場合はJSONパースを避ける
+    content_type = response['content-type']
+    if content_type&.include?('text/html')
+      Rails.logger.error "Received HTML instead of JSON from API"
+      return nil
+    end
 
     data = JSON.parse(response.body)
     return nil if data['error']
@@ -101,6 +113,60 @@ class JanCodeApiClient
     end
     
     nil
+  end
+
+  # WebサイトをスクレイピングしてJANコード情報を取得
+  def scrape_jancode_website(jan_code)
+    Rails.logger.info "Scraping jancode.xyz website for JAN code: #{jan_code}"
+    
+    begin
+      uri = URI("https://www.jancode.xyz/#{jan_code}/")
+      response = make_http_request(uri)
+      return nil unless response
+      
+      html_body = response.body
+      
+      # HTMLがエラーページかどうかチェック
+      if html_body.include?('ページを表示できません') || html_body.include?('システムエラー')
+        Rails.logger.info "Product not found on website: #{jan_code}"
+        return nil
+      end
+      
+      # 商品名を抽出（タイトルタグから）
+      title_match = html_body.match(/<title[^>]*>([^<]+)<\/title>/i)
+      if title_match
+        title = title_match[1].strip
+        # タイトルから不要な部分を除去
+        product_name = title.gsub(/\s*\|\s*JANCODE DATABASE.*$/, '').strip
+        
+        if product_name.present? && product_name != 'エラー'
+          Rails.logger.info "Found product on website: #{product_name}"
+          
+          # カフェイン量を推定
+          estimated_caffeine = CaffeineEstimator.estimate_caffeine_amount({
+            name: product_name,
+            category: nil
+          })
+          
+          return {
+            jan_code: jan_code,
+            name: product_name,
+            caffeine_amount_mg: estimated_caffeine,
+            image_url: nil,
+            category: nil,
+            maker: nil,
+            data_source: 'jancode_xyz_scraped',
+            is_estimated: true
+          }
+        end
+      end
+      
+      Rails.logger.info "Could not extract product name from website"
+      nil
+    rescue StandardError => e
+      Rails.logger.error "Website scraping error: #{e.message}"
+      nil
+    end
   end
 
   # 商品名や説明文からカフェイン量を抽出
