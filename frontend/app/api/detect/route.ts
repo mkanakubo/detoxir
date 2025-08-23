@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const path = join(process.cwd(), 'public', 'uploads', filename);
 
     // 画像を保存
-    await writeFile(path, buffer);
+    // await writeFile(path, buffer);
 
     // 成功レスポンスを返す
     return NextResponse.json({

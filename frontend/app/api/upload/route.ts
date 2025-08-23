@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const path = join(process.cwd(), 'public', 'uploads', filename);
 
     // 画像を保存
-    await writeFile(path, buffer);
+    // await writeFile(path, buffer);
 
     // ここで必要に応じて画像の処理やデータベースへの保存などを行う
 
