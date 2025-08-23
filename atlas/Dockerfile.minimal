@@ -1,11 +1,6 @@
+# Minimal Rails app for Cloud Run debugging
 # syntax=docker/dockerfile:1
 # check=error=true
-
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t atlas .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name atlas atlas
-
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.2.2
@@ -14,12 +9,12 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages (MySQL runtime libraries included)
+# Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl default-mysql-client libjemalloc2 libvips wget && \
+    apt-get install --no-install-recommends -y curl default-mysql-client libjemalloc2 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Set production environment (Cloud Run用の環境変数を追加)
+# Set production environment
 ENV RAILS_ENV="production" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development" \
@@ -45,15 +40,8 @@ RUN bundle config set --local path "${BUNDLE_PATH}" && \
 # Copy application code
 COPY . .
 
-# Precompile bootsnap code for faster boot times (skip if causing segfaults)
-# RUN bundle exec bootsnap precompile app/ lib/
-
 # Skip asset precompilation for API applications
-# Create empty manifest.json to prevent asset lookup errors
 RUN mkdir -p public/assets && echo '{}' > public/assets/manifest.json
-
-
-
 
 # Final stage for app image
 FROM base
@@ -77,6 +65,6 @@ ENV RAILS_LOG_TO_STDOUT=true
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
+# Start server directly with puma (bypassing thrust temporarily)
 EXPOSE 8080
-CMD ["./bin/thrust", "./bin/rails", "server", "-p", "8080"]
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-p", "8080"]

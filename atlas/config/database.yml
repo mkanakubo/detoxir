@@ -52,18 +52,22 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: atlas_production
-    username: atlas
-    password: <%= ENV["ATLAS_DATABASE_PASSWORD"] %>
+    database: <%= ENV.fetch("DATABASE_NAME") { "atlas_production" } %>
+    username: <%= ENV.fetch("DATABASE_USERNAME") { "atlas" } %>
+    password: <%= ENV.fetch("DATABASE_PASSWORD") { "atlas_password_123" } %>
+    host: <%= ENV.fetch("DATABASE_HOST") { "localhost" } %>
+    port: <%= ENV.fetch("DATABASE_PORT") { 3306 } %>
+    # Cloud SQL用のUnixソケット接続を優先
+    socket: <%= ENV["DATABASE_SOCKET"] %>
   cache:
     <<: *primary_production
-    database: atlas_production_cache
+    database: <%= ENV.fetch("DATABASE_NAME_CACHE") { "atlas_production_cache" } %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: atlas_production_queue
+    database: <%= ENV.fetch("DATABASE_NAME_QUEUE") { "atlas_production_queue" } %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: atlas_production_cable
+    database: <%= ENV.fetch("DATABASE_NAME_CABLE") { "atlas_production_cable" } %>
     migrations_paths: db/cable_migrate

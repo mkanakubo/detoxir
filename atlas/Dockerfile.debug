@@ -1,11 +1,6 @@
+# Debugging Dockerfile to check container state
 # syntax=docker/dockerfile:1
 # check=error=true
-
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t atlas .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name atlas atlas
-
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.2.2
@@ -14,7 +9,7 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages (MySQL runtime libraries included)
+# Install base packages (Cloud SQL Proxy用のcurlも追加)
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl default-mysql-client libjemalloc2 libvips wget && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
@@ -45,15 +40,9 @@ RUN bundle config set --local path "${BUNDLE_PATH}" && \
 # Copy application code
 COPY . .
 
-# Precompile bootsnap code for faster boot times (skip if causing segfaults)
-# RUN bundle exec bootsnap precompile app/ lib/
-
 # Skip asset precompilation for API applications
 # Create empty manifest.json to prevent asset lookup errors
 RUN mkdir -p public/assets && echo '{}' > public/assets/manifest.json
-
-
-
 
 # Final stage for app image
 FROM base
@@ -79,4 +68,5 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 8080
-CMD ["./bin/thrust", "./bin/rails", "server", "-p", "8080"]
+# Debug command to check bundle and gem availability
+CMD ["bundle", "exec", "ruby", "-e", "puts 'Ruby version: ' + RUBY_VERSION; puts 'Bundle path: ' + ENV['BUNDLE_PATH']; puts 'RAILS_ENV: ' + ENV['RAILS_ENV'].to_s; puts 'Current dir: ' + Dir.pwd; puts 'Bundle config:'; system('bundle config'); puts 'Checking rails...'; require 'rails'; puts 'Rails loaded successfully'; puts 'Starting simple server test...'; require_relative 'config/environment'; puts 'Rails application initialized successfully'"]
