@@ -5,7 +5,7 @@ export default function TimerDisplay() {
   return (
     <div
       style={{
-        backgroundColor: "black",
+        backgroundColor: "#1e1e1eff",
         width: "95%",
         height: "60px",
         color: "white",
@@ -14,7 +14,8 @@ export default function TimerDisplay() {
         textAlign: "center",
         marginLeft: "10px",
         marginRight: "5%",
-        border: "2px solid #95D600",
+        borderRadius: "10px",
+        border: "2px solid #39FF14",
       }}
     >
       <div>00:12:34</div> {/* 仮の固定表示 */}
