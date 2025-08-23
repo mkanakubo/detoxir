@@ -7,9 +7,35 @@ Rails.application.routes.draw do
 
   # API routes
   namespace :api, defaults: { format: :json } do
-    resources :product_identifications, only: [ :index, :show ]
-    resources :users
-    resources :caffeinated_products
+    namespace :v1 do
+      resources :product_identifications, only: [ :index, :show ]
+      resources :users, except: [:show] do
+        collection do
+          get 'show', to: 'users#show'
+        end
+      end
+      resources :caffeinated_products do
+        collection do
+          get 'find_by_jan_code/:jan_code', to: 'caffeinated_products#find_by_jan_code'
+        end
+      end
+      resources :caffeine_calculations, only: [:create]
+
+      # カフェイン計算関連のエンドポイント
+      namespace :caffeine_intake_events do
+        post :create
+        post :analysis
+        post :concentration_timeline
+      end
+
+      # シミュレーション関連のエンドポイント
+      namespace :simulation do
+        post :gradual_intake
+        post :detailed_analysis
+        post :concentration_timeline
+        post :create_intake_events
+      end
+    end
   end
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

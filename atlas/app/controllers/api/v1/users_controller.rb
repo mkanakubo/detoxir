@@ -1,13 +1,17 @@
 # frozen_string_literal: true
 
-class Api::UsersController < Api::ApplicationController
-  before_action :set_user, only: [ :show, :update, :destroy ]
+class Api::V1::UsersController < ApplicationController
+  before_action :set_user, only: [ :update, :destroy ]
 
   def index
     @users = User.all
   end
 
   def show
+    @user = User.find_by(auth0_id: params[:auth0_id])
+    unless @user
+      render json: { error: 'User not found' }, status: :not_found
+    end
   end
 
   def create
