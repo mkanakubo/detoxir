@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     apple: [{ url: "favicon.ico", sizes: "180x180" }],
   },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'mobile-web-app-capable': 'yes',
+  },
 };
 
 export const viewport: Viewport = {

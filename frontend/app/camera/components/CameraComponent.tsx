@@ -3,7 +3,6 @@
 import React, { useRef, useState } from 'react';
 import NextImage from 'next/image';
 import Webcam from 'react-webcam';
-import { createWorker, PSM } from 'tesseract.js';
 import { toast } from 'react-hot-toast';
 
 export type CameraComponentProps = {
@@ -12,8 +11,10 @@ export type CameraComponentProps = {
 
 export default function CameraComponent({ onImageUpload }: CameraComponentProps) {
   const webcamRef = useRef<Webcam>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [isIOSDevice, setIsIOSDevice] = useState(false);
   const [result, setResult] = useState<{
     success: boolean;
     janCode?: string;
@@ -22,11 +23,53 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
   const [serverJanCode, setServerJanCode] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  // ビデオの設定
-  const videoConstraints = {
-    width: 640,
-    height: 480,
-    facingMode: 'environment'
+  // iOS判定
+  React.useEffect(() => {
+    const userAgent = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    setIsIOSDevice(isIOS);
+  }, []);
+
+  // ビデオの設定（iOS対応）
+  const [videoConstraints, setVideoConstraints] = useState<MediaTrackConstraints>({
+    width: { ideal: 1280, max: 1920 },
+    height: { ideal: 720, max: 1080 },
+    facingMode: { exact: "environment" },
+    aspectRatio: 16/9
+  });
+
+  // カメラエラーハンドリング
+  const handleCameraError = (error: string | DOMException) => {
+    console.error('Camera error:', error);
+    setCameraError(typeof error === 'string' ? error : error.message);
+    
+    // iOS Safari でよくある問題への対処
+    if (typeof error === 'object' && error.name === 'OverconstrainedError') {
+      // constraintsを緩くしてリトライ
+      setVideoConstraints({
+        width: { ideal: 640, max: 1280 },
+        height: { ideal: 480, max: 720 },
+        facingMode: "environment",
+        aspectRatio: 4/3
+      } as MediaTrackConstraints);
+      toast.error('カメラの設定を調整しています...');
+    } else {
+      toast.error('カメラにアクセスできません。ファイル選択を使用してください。');
+    }
+  };
+
+  // ファイル選択からの画像読み込み
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImage(result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // 画像のキャプチャ
@@ -75,60 +118,6 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
 
     const calculatedCheck = (10 - (sum % 10)) % 10;
     return checkDigit === calculatedCheck;
-  };
-
-  // バーコード解析
-  const analyzeBarcode = async () => {
-    if (!image) return;
-
-    try {
-      setIsProcessing(true);
-
-      // 画像の前処理
-      const processedImage = await preprocessImage(image);
-
-      // Tesseract Workerの作成
-      const worker = await createWorker();
-      // OCR設定
-  await worker.reinitialize('eng');
-      await worker.setParameters({
-        tessedit_char_whitelist: '0123456789',
-        tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
-      });
-
-      // OCR実行
-      const { data: { text } } = await worker.recognize(processedImage);
-      console.log('OCR結果:', text, 'aaaaaaaaaaaaaaaaaa');
-      // Workerの終了
-      await worker.terminate();
-
-      // テキストから数字のみを抽出
-      const numbers = text.replace(/[^\d]/g, '');
-      console.log('抽出された数字:', numbers);
-      
-      if (validateJANCode(numbers)) {
-        setResult({
-          success: true,
-          janCode: numbers,
-          message: `JANコード(${numbers.length === 13 ? 'JAN-13' : 'JAN-8'})を検出しました`
-        });
-        toast.success('バーコードの検出に成功しました');
-        onImageUpload?.(true, numbers);
-      } else {
-        throw new Error('有効なJANコードが見つかりませんでした');
-      }
-
-    } catch (error) {
-      console.error('Barcode analysis error:', error);
-      setResult({
-        success: false,
-        message: '有効なバーコードを検出できませんでした。もう一度撮影してください。'
-      });
-      toast.error('バーコードの検出に失敗しました');
-      onImageUpload?.(false);
-    } finally {
-      setIsProcessing(false);
-    }
   };
   
   // 再撮影
@@ -198,7 +187,6 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
                   <button
                     onClick={handleRetake}
                     className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                    disabled={isProcessing}
                   >
                     再撮影
                   </button>
@@ -227,30 +215,70 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
             </>
           ) : (
             <>
-              <div className="relative">
-                <Webcam
-                  audio={false}
-                  ref={webcamRef}
-                  screenshotFormat="image/jpeg"
-                  videoConstraints={videoConstraints}
-                  className="rounded-lg border"
-                />
-                {/* バーコードガイドライン */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="border-4 border-lime-400 w-64 h-32 rounded-lg"></div>
+              {/* カメラエラーまたはiOSの場合の代替UI */}
+              {(cameraError || isIOSDevice) && (
+                <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+                  <p className="font-bold">カメラが利用できません</p>
+                  <p className="text-sm mt-1">
+                    {isIOSDevice 
+                      ? 'iOS端末では、ファイル選択機能をご利用ください。' 
+                      : cameraError
+                    }
+                  </p>
                 </div>
+              )}
+              
+              {/* ファイル選択UI */}
+              <div className="mb-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  ref={fileInputRef}
+                  onChange={handleFileInput}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg mb-4"
+                >
+                  📷 写真を撮影 / 選択
+                </button>
               </div>
+
+              {/* Webカメラコンポーネント（エラーがない場合のみ表示） */}
+              {!cameraError && (
+                <div className="relative">
+                  <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    videoConstraints={videoConstraints}
+                    className="rounded-lg border"
+                    onUserMediaError={handleCameraError}
+                  />
+                  {/* バーコードガイドライン */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="border-4 border-lime-400 w-64 h-32 rounded-lg"></div>
+                  </div>
+                </div>
+              )}
+              
               <p className="text-gray-300 text-center">
                 バーコードを枠内に合わせて撮影してください
               </p>
-              <div className="flex justify-center">
-                <button
-                  onClick={capture}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  撮影
-                </button>
-              </div>
+              
+              {/* 撮影ボタン（カメラが利用可能な場合のみ） */}
+              {!cameraError && (
+                <div className="flex justify-center">
+                  <button
+                    onClick={capture}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    撮影
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -258,26 +286,4 @@ export default function CameraComponent({ onImageUpload }: CameraComponentProps)
     </div>
   );
 }
-
-// ...existing code...
-
-const sendImageToBackend = async (imageBase64: string) => {
-  try {
-    const response = await fetch('/api/v2/detect', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageBase64 }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      // JANコードなどの結果を利用
-      console.log('JANコード:', data.jancode);
-      // 必要ならsetStateで画面表示
-    } else {
-      console.error('APIエラー:', data.message || data.error);
-    }
-  } catch (err) {
-    console.error('通信エラー:', err);
-  }
-};
 

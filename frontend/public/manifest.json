@@ -27,5 +27,12 @@
   "lang": "ja",
   "name": "Detoxir",
   "short_name": "Detoxir",
-  "start_url": "/"
+  "start_url": "/",
+  "permissions": [
+    "camera"
+  ],
+  "categories": [
+    "productivity",
+    "utilities"
+  ]
 }
