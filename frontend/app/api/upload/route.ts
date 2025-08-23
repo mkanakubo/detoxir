@@ -9,11 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!image) {
       return NextResponse.json(
-        { 
-          success: false,
-          message: '画像が提供されていません',
-          error: 'No image provided' 
-        },
+        { error: 'No image provided' },
         { status: 400 }
       );
     }
@@ -30,25 +26,13 @@ export async function POST(request: NextRequest) {
     // 画像を保存
     // await writeFile(path, buffer);
 
-    // 成功レスポンスを返す
-    return NextResponse.json({
-      success: true,
-      message: '画像の送信に成功しました',
-      data: {
-        filename,
-        timestamp,
-        filepath: `/uploads/${filename}` // クライアントサイドでアクセス可能なパス
-      }
-    });
+    // ここで必要に応じて画像の処理やデータベースへの保存などを行う
 
+    return NextResponse.json({ success: true, filename });
   } catch (error) {
-    console.error('Detection error:', error);
+    console.error('Upload error:', error);
     return NextResponse.json(
-      { 
-        success: false,
-        message: '画像の送信に失敗しました',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to upload image' },
       { status: 500 }
     );
   }
