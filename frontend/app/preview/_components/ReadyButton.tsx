@@ -5,46 +5,33 @@ export default function ReadyButton() {
   const router = useRouter();
 
   return (
-    <div
-      style={{
-        width: "90%",
-        marginLeft: "5%",
-        display: "flex",
-        gap: 12, // ボタンの間隔
-      }}
-    >
+    <div className="w-[90%] ml-[5%] flex gap-3">
+      {/* Cancel ボタン（左側） */}
       <button
-        style={{
-          flex: 1,
-          height: "50px",
-          fontSize: "0.9rem",
-          borderRadius: "10px",
-          fontWeight: 700,
-          border: "2px solid #39FF14",
-          backgroundColor: "#1e1e1eff",
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-        }}
+        className="relative flex-1 group"
         onClick={() => router.push("/")}
       >
-        Start
+        {/* グラデーション背景 */}
+        <div className="absolute inset-0 bg-gradient-to-r from-red-400 via-pink-500 to-red-600 rounded-xl blur-sm group-hover:blur-md transition-all duration-300"></div>
+
+        {/* メインボタン */}
+        <div className="relative bg-gradient-to-r from-red-400 via-pink-500 to-red-600 text-gray-900 font-bold py-3 rounded-xl shadow-2xl transform group-hover:scale-105 group-active:scale-95 transition-all duration-200 text-center">
+          Cancel
+        </div>
       </button>
 
+      {/* Start ボタン */}
       <button
-        style={{
-          flex: 1,
-          height: "50px",
-          fontSize: "0.9rem",
-          borderRadius: "10px",
-          fontWeight: 700,
-          border: "2px solid #39FF14",
-          backgroundColor: "#1e1e1eff",
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-        }}
+        className="relative flex-1 group"
         onClick={() => router.push("/")}
       >
-        Cancel
+        {/* グラデーション背景 */}
+        <div className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 rounded-xl blur-sm group-hover:blur-md transition-all duration-300"></div>
+
+        {/* メインボタン */}
+        <div className="relative bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 text-gray-900 font-bold py-3 rounded-xl shadow-2xl transform group-hover:scale-105 group-active:scale-95 transition-all duration-200 text-center">
+          Start
+        </div>
       </button>
     </div>
   );
